@@ -1,6 +1,18 @@
 clc
 clear all
 
+num_iter = 10;
+EbNo_vec = 1:num_iter;
+err_bpsk = zeros(1, num_iter);
+
+for i = 1:num_iter
+    EbNo = i;
+    sim('tpi_sim');
+    err_bpsk(i) = ErrorVec(1,1);
+end
+
+%%
+
 largo_entrada = 1000;
 
 stages = 7;
