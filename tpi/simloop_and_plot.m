@@ -2,6 +2,9 @@ clc
 clear all
 
 stages1 = 7;
+stages2 = 3;
+stages3 = 5;
+stages4 = 9;
 num_iter = 10;
 max_symbols = 5e4;
 EbNo_vec = 1:num_iter;
@@ -14,9 +17,23 @@ psk8_cod_sim = zeros(1, num_iter);
 psk8_sim = zeros(1, num_iter);
 qam16_cod_sim = zeros(1, num_iter);
 qam16_sim = zeros(1, num_iter);
+qam64_cod_sim = zeros(1, num_iter);
+qam64_sim = zeros(1, num_iter);
+cod2_sim = zeros(1, num_iter);
+cod3_sim = zeros(1, num_iter);
+cod4_sim = zeros(1, num_iter);
 
 trellis1 = poly2trellis(stages1,[171 133]);
 tbd1 = 5*(stages1 - 1);
+
+trellis2 = poly2trellis(stages2,[5 7]);         % cod2
+tbd2 = 5*(stages2 - 1);
+
+trellis3 = poly2trellis(stages3,[35 23]);
+tbd3 = 5*(stages3 - 1);
+
+trellis4 = poly2trellis(stages4,[753 561]);
+tbd4 = 5*(stages4 - 1);
 
 for EbNo = 1:num_iter
     sim('tpi_sim');
@@ -32,6 +49,13 @@ for EbNo = 1:num_iter
     
     qam16_cod_sim(EbNo) = qam16_cod(1,1);
     qam16_sim(EbNo) = qam16(1,1)/4;
+    
+    qam64_cod_sim(EbNo) = qam64_cod(1,1);
+    qam64_sim(EbNo) = qam64(1,1)/6;
+    
+    cod2_sim(EbNo) = cod2(1,1);
+    cod3_sim(EbNo) = cod3(1,1);
+    cod4_sim(EbNo) = cod4(1,1);
     
 end
 
@@ -82,16 +106,14 @@ grid on;
 % 8PSK con/sin cod. sim y teo.
 
 psk8_teo = berawgn(EbNo_vec, 'psk', 8, 'nondiff');
-psk8_cod_teo = [0.5 0.5 0.5 0.5 0.1466848090 0.0258046628 0.0035222302 0.0003643322 0.0000279345 0.0000014887];
 
 figure(3)
 
 semilogy(EbNo_vec, psk8_sim, '--o', ...
         EbNo_vec, psk8_cod_sim, '--v', ...
-        EbNo_vec, psk8_teo, ...
-        EbNo_vec, psk8_cod_teo, 'LineWidth', 3.5);
+        EbNo_vec, psk8_teo, 'LineWidth', 3.5);
 
-legend('8PSK s/cod. sim.', '8PSK c/cod. sim.', '8PSK s/cod. teo.', '8PSK c/cod. teo.');
+legend('8PSK s/cod. sim.', '8PSK c/cod. sim.', '8PSK s/cod. teo.');
 title('8PSK - Con/sin cod.');
 xlabel('Eb/No [dB]');
 ylabel('Bit Error Rate');
@@ -103,17 +125,90 @@ grid on;
 % 16-QAM con/sin cod. sim y teo.
 
 qam16_teo = berawgn(EbNo_vec, 'qam', 16, 'nondiff');
-qam16_cod_teo = [0.5 0.5 0.5 0.5 0.5 0.1120017182 0.0173575430 0.0019746309 0.0001643850 0.0000098397];
 
 figure(4)
 
 semilogy(EbNo_vec, qam16_sim, '--o', ...
         EbNo_vec, qam16_cod_sim, '--v', ...
-        EbNo_vec, qam16_teo, ...
-        EbNo_vec, qam16_cod_teo, 'LineWidth', 3.5);
+        EbNo_vec, qam16_teo, 'LineWidth', 3.5);
 
-legend('16-QAM s/cod. sim.', '16-QAM c/cod. sim.', '16-QAM s/cod. teo.', '16-QAM c/cod. teo.');
+legend('16-QAM s/cod. sim.', '16-QAM c/cod. sim.', '16-QAM s/cod. teo.');
 title('16-QAM - Con/sin cod.');
+xlabel('Eb/No [dB]');
+ylabel('Bit Error Rate');
+
+grid on;
+
+%%
+
+% 64-QAM con/sin cod. sim y teo.
+
+qam64_teo = berawgn(EbNo_vec, 'qam', 64, 'nondiff');
+
+figure(5)
+
+semilogy(EbNo_vec, qam64_sim, '--o', ...
+        EbNo_vec, qam64_cod_sim, '--v', ...
+        EbNo_vec, qam64_teo, 'LineWidth', 3.5);
+
+legend('64-QAM s/cod. sim.', '64-QAM c/cod. sim.', '64-QAM s/cod. teo.');
+title('64-QAM - Con/sin cod.');
+xlabel('Eb/No [dB]');
+ylabel('Bit Error Rate');
+
+grid on;
+
+%%
+
+% Todas las modulaciones sin codificar
+
+figure(6)
+
+semilogy(EbNo_vec, bpsk_sim, '--o', ...
+        EbNo_vec, qpsk_sim, '--v', ...
+        EbNo_vec, psk8_sim, '--square', ...
+        EbNo_vec, qam16_sim, '--diamond', ...
+        EbNo_vec, qam64_sim, '-->', 'LineWidth', 3.5);
+
+legend('BPSK', 'QPSK', '8PSK', '16-QAM', '64-QAM');
+title('BER simulado para todas las modulaciones sin codificar');
+xlabel('Eb/No [dB]');
+ylabel('Bit Error Rate');
+
+grid on;
+
+%%
+
+% Todas las modulaciones con codificacion
+
+figure(7)
+
+semilogy(EbNo_vec, bpsk_cod_sim, '--o', ...
+        EbNo_vec, qpsk_cod_sim, '--v', ...
+        EbNo_vec, psk8_cod_sim, '--square', ...
+        EbNo_vec, qam16_cod_sim, '--diamond', ...
+        EbNo_vec, qam64_cod_sim, '-->', 'LineWidth', 3.5);
+
+legend('BPSK', 'QPSK', '8PSK', '16-QAM', '64-QAM');
+title('BER simulado para todas las modulaciones con codificacion 171 133');
+xlabel('Eb/No [dB]');
+ylabel('Bit Error Rate');
+
+grid on;
+
+%%
+
+% Otros codigos convolucionales
+
+figure(8)
+
+semilogy(EbNo_vec, cod2_sim, '--o', ...
+        EbNo_vec, cod3_sim, '--v', ...
+        EbNo_vec, qpsk_cod_sim, '--square', ...
+        EbNo_vec, cod4_sim, '-->', 'LineWidth', 3.5);
+
+legend('3 [5 7]', '5 [35 23]', '7 [171 133]', '9 [753 561]');
+title('Codigos convolucionales 1/2 de 3, 5, 7 y 9 etapas');
 xlabel('Eb/No [dB]');
 ylabel('Bit Error Rate');
 
