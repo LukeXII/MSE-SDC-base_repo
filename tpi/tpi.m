@@ -1,21 +1,30 @@
 clc
 clear all
 
-num_iter = 10;
+stages1 = 7;
+num_iter = 8;
+max_symbols = 2e4;
 EbNo_vec = 1:num_iter;
-err_bpsk = zeros(1, num_iter);
 
-for i = 1:num_iter
-    EbNo = i;
+bpsk_cod_sim = zeros(1, num_iter);
+bpsk_sim = zeros(1, num_iter);
+
+trellis1 = poly2trellis(stages1,[171 133]);
+tbd1 = 5*(stages1 - 1);
+
+for EbNo = 1:num_iter
     sim('tpi_sim');
-    err_bpsk(i) = ErrorVec(1,1);
+    
+    bpsk_cod_sim(EbNo) = bpsk_cod(1,1);
+    bpsk_sim(EbNo) = bpsk(1,1);
+    
 end
 
 %%
 
 largo_entrada = 1000;
 
-stages = 7;
+
 data_bits = 1;
 code_bits = 3;
 prob_error = 0.5;
