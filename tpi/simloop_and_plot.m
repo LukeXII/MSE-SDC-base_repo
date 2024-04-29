@@ -6,7 +6,7 @@ stages2 = 3;
 stages3 = 5;
 stages4 = 9;
 num_iter = 10;
-max_symbols = 5e4;
+max_symbols = 3e5;
 EbNo_vec = 1:num_iter;
 
 bpsk_cod_sim = zeros(1, num_iter);
